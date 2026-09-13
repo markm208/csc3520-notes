@@ -1,0 +1,2240 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Command Line Cheat Sheet</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/github.min.css">
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+    <style>
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            color: #333;
+        }
+
+        .toolbar {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            z-index: 1000;
+        }
+
+        .toolbar-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            padding: 0;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 50%;
+            cursor: pointer;
+            color: #333;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            transition: all 0.2s;
+        }
+
+        .toolbar-btn:hover {
+            background: #f8f9fa;
+            border-color: #adb5bd;
+            transform: scale(1.05);
+        }
+
+        .toolbar-btn .note-count {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: #e63946;
+            color: white;
+            font-size: 0.65rem;
+            font-weight: 600;
+            min-width: 18px;
+            height: 18px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+        }
+
+        .toolbar-btn .note-count:empty {
+            display: none;
+        }
+
+        .toolbar-btn {
+            position: relative;
+        }
+
+        .info-btn {
+            background: #457b9d;
+            border-color: #457b9d;
+            color: white;
+        }
+
+        .info-btn:hover {
+            background: #3a6a87;
+            border-color: #3a6a87;
+        }
+
+        .info-tooltip {
+            position: absolute;
+            bottom: 100%;
+            right: 0;
+            margin-bottom: 0.5rem;
+            width: 260px;
+            padding: 0.75rem;
+            background: #333;
+            color: white;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            border-radius: 6px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s, visibility 0.2s;
+            text-align: left;
+            pointer-events: none;
+        }
+
+        .info-tooltip .storage-info {
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid rgba(255,255,255,0.3);
+            font-size: 0.75rem;
+            opacity: 0.9;
+        }
+
+        .info-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            right: 16px;
+            border: 6px solid transparent;
+            border-top-color: #333;
+        }
+
+        .info-btn:hover .info-tooltip,
+        .info-btn:focus .info-tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .toc-panel {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 5rem;
+            width: 280px;
+            max-height: 400px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            z-index: 999;
+            display: none;
+            flex-direction: column;
+        }
+
+        .toc-panel.open {
+            display: flex;
+        }
+
+        .toc-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .toc-close {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            color: #888;
+            line-height: 1;
+        }
+
+        .toc-close:hover {
+            color: #333;
+        }
+
+        .toc-nav {
+            overflow-y: auto;
+            padding: 0.5rem 0;
+        }
+
+        .toc-item {
+            display: block;
+            padding: 0.4rem 1rem;
+            color: #333;
+            text-decoration: none;
+            font-size: 0.85rem;
+            border-left: 3px solid transparent;
+            transition: all 0.15s;
+        }
+
+        .toc-item:hover {
+            background: #f8f9fa;
+            border-left-color: #e63946;
+        }
+
+        .toc-item.toc-h2 {
+            padding-left: 1.5rem;
+            font-size: 0.8rem;
+        }
+
+        .toc-item.toc-h3 {
+            padding-left: 2rem;
+            font-size: 0.75rem;
+            color: #666;
+        }
+
+        .toc-count {
+            color: #2a9d8f;
+            font-weight: 600;
+        }
+
+        .toc-quiz-count {
+            display: inline-block;
+            padding: 0 0.35em;
+            background: #f4a261;
+            color: white;
+            border-radius: 8px;
+            font-size: 0.75em;
+            font-weight: 700;
+        }
+
+        .toc-totals {
+            padding: 0.4rem 0.75rem 0.6rem;
+            font-size: 0.8rem;
+            color: #888;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 0.4rem;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+            color: #1a1a1a;
+            border-bottom: 2px solid #e63946;
+            padding-bottom: 0.25rem;
+        }
+
+        h2 {
+            font-size: 1.35rem;
+            margin-top: 2rem;
+            margin-bottom: 0.75rem;
+            color: #1a1a1a;
+            border-bottom: 2px solid #e63946;
+            padding-bottom: 0.25rem;
+        }
+
+        h3 {
+            font-size: 1.15rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #2a9d8f;
+        }
+
+        h4, h5, h6 {
+            margin-top: 1.25rem;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.35rem;
+        }
+
+        blockquote {
+            background: #f8f9fa;
+            border-left: 4px solid #2a9d8f;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 6px 6px 0;
+        }
+
+        blockquote p:last-child {
+            margin-bottom: 0;
+        }
+
+        code {
+            background: #e9ecef;
+            padding: 0.15rem 0.4rem;
+            border-radius: 3px;
+            font-family: "SF Mono", Monaco, "Cascadia Code", monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background: #f8f9fa;
+            border-left: 4px solid #e63946;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 6px 6px 0;
+            overflow-x: auto;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            font-size: 0.85em;
+            line-height: 1.5;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            margin: 1rem 0;
+            border-radius: 6px;
+        }
+
+        a {
+            color: #e63946;
+        }
+
+        a:hover {
+            color: #c1121f;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #ddd;
+            margin: 2rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 0.5rem;
+            text-align: left;
+        }
+
+        th {
+            background: #f8f9fa;
+        }
+
+        .note-anchor {
+            margin-bottom: 0.5rem;
+        }
+
+        [data-section-id] {
+            transition: background 0.15s, box-shadow 0.15s;
+            border-radius: 4px;
+        }
+
+        /* Preview of where a note will attach: same visual language as
+           the note containers (light blue tint, blue left bar). Uses a
+           box-shadow bar so hovering never shifts the layout. */
+        .note-target-highlight {
+            background: #e8f4f8;
+            box-shadow: -6px 0 0 #457b9d;
+        }
+
+        .add-note-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.25rem 0.5rem;
+            background: transparent;
+            border: 1px dashed #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            color: #888;
+            transition: all 0.2s;
+        }
+
+        .add-note-btn:hover {
+            background: #f8f9fa;
+            border-color: #2a9d8f;
+            color: #2a9d8f;
+        }
+
+        .note-container {
+            background: #e8f4f8;
+            border-left: 4px solid #457b9d;
+            padding: 0.75rem 1rem;
+            margin: 0.5rem 0 1rem 0;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .note-container.needs-clarification {
+            background: #fee2e2;
+            border-left-color: #e63946;
+        }
+
+        .note-container.needs-clarification .note-label {
+            color: #c1121f;
+        }
+
+        .clarification-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+            color: #666;
+        }
+
+        .clarification-checkbox input {
+            cursor: pointer;
+        }
+
+        .clarification-checkbox label {
+            cursor: pointer;
+        }
+
+        .note-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .note-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #457b9d;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .note-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .note-actions button {
+            padding: 0.2rem 0.5rem;
+            font-size: 0.75rem;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .note-actions button:hover {
+            background: #f0f0f0;
+        }
+
+        .note-actions .delete-btn:hover {
+            background: #fee;
+            border-color: #e63946;
+            color: #e63946;
+        }
+
+        .note-container.editing .edit-btn,
+        .note-container.editing .delete-btn {
+            display: none;
+        }
+
+        .note-editor {
+            width: 100%;
+            min-height: 100px;
+            padding: 0.5rem;
+            font-family: inherit;
+            font-size: 0.9rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: vertical;
+            margin-bottom: 0.5rem;
+        }
+
+        .note-editor:focus {
+            outline: none;
+            border-color: #457b9d;
+        }
+
+        .note-content {
+            font-size: 0.9rem;
+        }
+
+        .note-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        .note-meta {
+            font-size: 0.7rem;
+            color: #888;
+            margin-top: 0.5rem;
+        }
+
+        .collapsed .note-content,
+        .collapsed .note-meta,
+        .collapsed .clarification-checkbox {
+            display: none;
+        }
+
+        .collapsed .note-header {
+            margin-bottom: 0;
+        }
+
+        .expand-indicator {
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .hljs {
+            background: transparent !important;
+        }
+
+        .review-btn-glyph {
+            font-size: 19px;
+            font-weight: 700;
+            line-height: 1;
+            font-family: Georgia, 'Times New Roman', serif;
+        }
+
+        /* ----- Notes backup panel ----- */
+        .backup-panel {
+            position: fixed;
+            bottom: 5.5rem;
+            right: 1.5rem;
+            width: 260px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+            padding: 1rem;
+            z-index: 250;
+            font-size: 0.85rem;
+        }
+
+        .backup-panel p {
+            margin: 0.5rem 0 0.75rem;
+            color: #666;
+        }
+
+        .backup-action {
+            display: block;
+            width: 100%;
+            padding: 0.5rem;
+            margin-bottom: 0.4rem;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .backup-action:hover {
+            border-color: #457b9d;
+            color: #457b9d;
+        }
+
+        @media print {
+            .backup-panel {
+                display: none !important;
+            }
+        }
+
+        /* ----- Review mode ----- */
+        .review-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 400;
+            padding: 1rem;
+        }
+
+        /* display: flex above would otherwise override the browser's
+           default [hidden] { display: none }, making the hidden
+           attribute useless on this element */
+        .review-overlay[hidden] {
+            display: none;
+        }
+
+        .review-panel {
+            background: white;
+            border-radius: 8px;
+            width: min(640px, 100%);
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 1.25rem 1.5rem;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #e76f51;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        #review-close {
+            border: none;
+            background: none;
+            font-size: 1.5rem;
+            line-height: 1;
+            cursor: pointer;
+            color: #888;
+        }
+
+        #review-close:hover {
+            color: #e63946;
+        }
+
+        .review-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            margin-top: 0.75rem;
+        }
+
+        .review-option {
+            text-align: left;
+            padding: 0.6rem 0.75rem;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+
+        .review-option:hover {
+            border-color: #f4a261;
+        }
+
+        .review-option.wrong {
+            background: #fee2e2;
+            border-color: #e63946;
+            color: #c1121f;
+        }
+
+        .review-option.right {
+            background: #e6f4f1;
+            border-color: #2a9d8f;
+            color: #1d7268;
+            font-weight: 600;
+        }
+
+        .review-explanation {
+            margin-top: 0.75rem;
+            padding: 0.75rem;
+            background: #e6f4f1;
+            border-left: 4px solid #2a9d8f;
+            border-radius: 0 4px 4px 0;
+            font-size: 0.9rem;
+        }
+
+        .review-explanation > *:last-child {
+            margin-bottom: 0;
+        }
+
+        .review-next {
+            margin-top: 1rem;
+            padding: 0.5rem 1.25rem;
+            background: #e63946;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .review-next:hover {
+            background: #c1121f;
+        }
+
+        .review-score {
+            text-align: center;
+            padding: 1rem 0;
+        }
+
+        .review-score .score-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2a9d8f;
+            margin-bottom: 0.5rem;
+        }
+
+        .review-score .review-next {
+            margin: 1rem 0.25rem 0;
+        }
+
+        .review-score .review-next.secondary {
+            background: none;
+            border: 1px solid #aaa;
+            color: #666;
+        }
+
+        @media print {
+            .review-overlay {
+                display: none !important;
+            }
+        }
+
+        /* ----- Presenter mode ----- */
+        body.presenting .toolbar,
+        body.presenting .note-anchor,
+        body.presenting .note-container,
+        body.presenting .orphan-notes {
+            display: none !important;
+        }
+
+        body.presenting .content > * {
+            opacity: 0.12;
+            transition: opacity 0.25s;
+        }
+
+        body.presenting .content > .presenter-current {
+            opacity: 1;
+        }
+
+        .presenter-counter {
+            position: fixed;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.75);
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            z-index: 300;
+            white-space: nowrap;
+        }
+
+        @media print {
+            .presenter-counter {
+                display: none !important;
+            }
+        }
+
+        .quiz-block {
+            margin: 1.25rem 0;
+            padding: 1rem 1.25rem;
+            background: #fff8f0;
+            border: 1px solid #f4a261;
+            border-left: 4px solid #f4a261;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .quiz-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #e76f51;
+            margin-bottom: 0.5rem;
+        }
+
+        .quiz-question > *:last-child {
+            margin-bottom: 0.75rem;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .quiz-option {
+            text-align: left;
+            padding: 0.5rem 0.75rem;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: border-color 0.15s, background 0.15s;
+        }
+
+        .quiz-option:hover {
+            border-color: #f4a261;
+        }
+
+        .quiz-option.wrong {
+            background: #fee2e2;
+            border-color: #e63946;
+            color: #c1121f;
+            cursor: default;
+        }
+
+        .quiz-option.right {
+            background: #e6f4f1;
+            border-color: #2a9d8f;
+            color: #1d7268;
+            font-weight: 600;
+        }
+
+        .quiz-block.solved .quiz-option:not(.right):not(.wrong) {
+            opacity: 0.6;
+            cursor: default;
+        }
+
+        .quiz-explanation {
+            margin-top: 0.75rem;
+            padding: 0.75rem;
+            background: #e6f4f1;
+            border-left: 4px solid #2a9d8f;
+            border-radius: 0 4px 4px 0;
+            font-size: 0.9em;
+        }
+
+        .quiz-explanation > *:last-child {
+            margin-bottom: 0;
+        }
+
+        .quiz-reset {
+            margin-top: 0.6rem;
+            padding: 0.25rem 0.75rem;
+            background: none;
+            border: 1px solid #aaa;
+            border-radius: 4px;
+            color: #666;
+            font-size: 0.8em;
+            cursor: pointer;
+        }
+
+        .quiz-reset:hover {
+            border-color: #f4a261;
+            color: #e76f51;
+        }
+
+        .orphan-notes {
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 2px dashed #ddd;
+        }
+
+        .orphan-notes .orphan-heading {
+            color: #666;
+            border-bottom-color: #adb5bd;
+        }
+
+        .orphan-explain {
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .orphan-note {
+            background: #f8f9fa;
+            border-left: 4px solid #adb5bd;
+            padding: 0.75rem 1rem;
+            margin: 0.75rem 0;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .orphan-excerpt {
+            font-size: 0.8rem;
+            color: #888;
+            font-style: italic;
+            margin-bottom: 0.5rem;
+        }
+
+        .orphan-note .note-content {
+            font-size: 0.9rem;
+        }
+
+        .orphan-note .clarification-flag {
+            font-size: 0.75rem;
+            color: #c1121f;
+            font-weight: 500;
+            margin-top: 0.5rem;
+        }
+
+        .orphan-delete-btn {
+            margin-top: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            background: none;
+            border: 1px solid #adb5bd;
+            border-radius: 4px;
+            color: #666;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+
+        .orphan-delete-btn:hover {
+            border-color: #e63946;
+            color: #e63946;
+        }
+
+        @media print {
+            .toolbar,
+            .toc-panel,
+            .add-note-btn,
+            .note-actions,
+            .clarification-checkbox,
+            .orphan-delete-btn,
+            .quiz-reset {
+                display: none !important;
+            }
+
+            /* On paper the quiz cannot be interactive: mark the correct
+               answer and show the explanation */
+            .quiz-option[data-correct="true"] {
+                background: #e6f4f1;
+                border-color: #2a9d8f;
+                font-weight: 600;
+            }
+
+            .quiz-explanation[hidden] {
+                display: block !important;
+            }
+
+            .note-container.needs-clarification::before {
+                content: "⚠ Needs clarification";
+                display: block;
+                font-size: 0.75rem;
+                font-weight: 600;
+                color: #c1121f;
+                margin-bottom: 0.5rem;
+            }
+
+            .note-container {
+                break-inside: avoid;
+            }
+
+            .collapsed .note-content,
+            .collapsed .note-meta {
+                display: block !important;
+            }
+
+            body {
+                max-width: none;
+                padding: 0;
+            }
+        }
+            
+    </style>
+</head>
+<body onload="hljs.highlightAll()">
+    <div class="backup-panel" id="backup-panel" hidden>
+        <strong>Back up your notes</strong>
+        <p>
+            Notes live only in this browser. Save them to a file to keep a copy
+            or move them to another computer.
+        </p>
+        <button class="backup-action" id="notes-export-btn">Export notes to a file</button>
+        <button class="backup-action" id="notes-import-btn">Import notes from a file</button>
+        <input type="file" id="notes-import-input" accept=".json,application/json" hidden>
+    </div>
+    <div class="review-overlay" id="review-overlay" hidden>
+        <div class="review-panel">
+            <div class="review-header">
+                <span id="review-progress"></span>
+                <button id="review-close" title="Close (Esc)">&times;</button>
+            </div>
+            <div id="review-body"></div>
+        </div>
+    </div>
+    <div class="presenter-counter" id="presenter-counter" hidden>
+        <span id="presenter-position"></span> &middot; arrow keys to move &middot; Esc to exit
+    </div>
+    <div class="toolbar">
+        <button class="toolbar-btn" id="presenter-btn" title="Presenter mode (P)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="4" width="20" height="13" rx="2"/>
+                <path d="M8 21h8M12 17v4"/>
+            </svg>
+        </button>
+        <button class="toolbar-btn" id="toc-btn" title="Table of Contents">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M4 6h16M4 12h16M4 18h10"/>
+            </svg>
+        </button>
+        <button class="toolbar-btn" id="font-down-btn" title="Decrease font size">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14"/>
+            </svg>
+        </button>
+        <button class="toolbar-btn" id="font-up-btn" title="Increase font size">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 5v14M5 12h14"/>
+            </svg>
+        </button>
+        <button class="toolbar-btn" id="toggle-notes-btn" title="Expand All Notes">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 9l6 6 6-6"/>
+            </svg>
+            <span class="note-count"></span>
+        </button>
+        <button class="toolbar-btn" id="review-btn" title="Practice all questions">
+            <span class="review-btn-glyph">?</span>
+        </button>
+        <button class="toolbar-btn" id="export-html-btn" title="Download page with notes">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+            </svg>
+        </button>
+        <button class="toolbar-btn" id="backup-btn" title="Back up / restore notes">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M8 7l4-4 4 4M12 3v11"/>
+                <path d="M8 17l4 4 4-4M12 21V10" transform="translate(0,0)" opacity="0"/>
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+            </svg>
+        </button>
+        <button class="toolbar-btn" id="print-btn" title="Print / Save as PDF">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/>
+                <rect x="6" y="14" width="12" height="8"/>
+            </svg>
+        </button>
+        <button class="toolbar-btn info-btn" id="info-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 16v-4M12 8h.01"/>
+            </svg>
+            <div class="info-tooltip">
+                <strong>About Your Notes</strong><br>
+                Your notes are stored locally in this browser only.
+                They are not visible to your instructor and will be lost if you clear browser data.
+                Use the export button to save a permanent copy.
+                <div class="storage-info" id="storage-info"></div>
+            </div>
+        </button>
+    </div>
+    <div class="toc-panel" id="toc-panel">
+        <div class="toc-header">
+            <strong>Table of Contents</strong>
+            <button class="toc-close" id="toc-close">&times;</button>
+        </div>
+        <nav class="toc-nav" id="toc-nav"></nav>
+    </div>
+
+    <main class="content">
+        <h1 data-section-id="command-line-cheat-sheet-1ff88dbc">Command Line Cheat Sheet</h1><div class="note-anchor" data-for="command-line-cheat-sheet-1ff88dbc"></div>
+<p data-section-id="command-line-cheat-sheet-8eb96f60">A quick reference for the commands covered in the CLI tutorial. Use <code>man &lt;command&gt;</code> for full details on any of them.</p><div class="note-anchor" data-for="command-line-cheat-sheet-8eb96f60"></div>
+<h2 data-section-id="navigation-2cd52ea3">Navigation</h2><div class="note-anchor" data-for="navigation-2cd52ea3"></div>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>pwd</code></td>
+<td>Print your current working directory</td>
+</tr>
+<tr>
+<td><code>cd &lt;dir&gt;</code></td>
+<td>Move down into a subdirectory</td>
+</tr>
+<tr>
+<td><code>cd ..</code></td>
+<td>Move up to the parent directory</td>
+</tr>
+<tr>
+<td><code>cd /</code></td>
+<td>Move to the root directory</td>
+</tr>
+<tr>
+<td><code>cd ~</code> or <code>cd</code></td>
+<td>Move to your home directory</td>
+</tr>
+<tr>
+<td><code>ls</code></td>
+<td>List the contents of the current directory</td>
+</tr>
+<tr>
+<td><code>ls &lt;path&gt;</code></td>
+<td>List the contents of another directory</td>
+</tr>
+<tr>
+<td><code>ls -l</code></td>
+<td>Long listing: permissions, owner, size, modification time</td>
+</tr>
+<tr>
+<td><code>ls -a</code></td>
+<td>List all files, including hidden files (names starting with <code>.</code>)</td>
+</tr>
+</tbody></table>
+<p data-section-id="navigation-9a84eb00"><strong>Path symbols:</strong> <code>/</code> root directory, <code>~</code> home directory, <code>..</code> parent directory, <code>.</code> current directory. A path starting with <code>/</code> is a full path. Anything else is relative to your current working directory.</p><div class="note-anchor" data-for="navigation-9a84eb00"></div>
+<h2 data-section-id="working-with-files-and-d-f1d010d5">Working with Files and Directories</h2><div class="note-anchor" data-for="working-with-files-and-d-f1d010d5"></div>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>touch &lt;file&gt;</code></td>
+<td>Create an empty file (or update its modification time)</td>
+</tr>
+<tr>
+<td><code>mkdir &lt;dir&gt;</code></td>
+<td>Create a new directory</td>
+</tr>
+<tr>
+<td><code>mv &lt;src&gt; &lt;dest&gt;</code></td>
+<td>Move or rename a file or directory</td>
+</tr>
+<tr>
+<td><code>cp &lt;src&gt; &lt;dest&gt;</code></td>
+<td>Copy a file</td>
+</tr>
+<tr>
+<td><code>rm &lt;file&gt;</code></td>
+<td>Delete a file (permanently, no confirmation!)</td>
+</tr>
+<tr>
+<td><code>rm -r &lt;dir&gt;</code></td>
+<td>Delete a directory and everything in it (careful!)</td>
+</tr>
+<tr>
+<td><code>nano &lt;file&gt;</code></td>
+<td>Edit a file in a simple terminal editor</td>
+</tr>
+</tbody></table>
+<h2 data-section-id="viewing-and-searching-80fce725">Viewing and Searching</h2><div class="note-anchor" data-for="viewing-and-searching-80fce725"></div>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>cat &lt;file&gt;</code></td>
+<td>Print a file's contents to the terminal</td>
+</tr>
+<tr>
+<td><code>more &lt;file&gt;</code></td>
+<td>View a file one page at a time (space = next page, <code>q</code> = quit)</td>
+</tr>
+<tr>
+<td><code>grep '&lt;text&gt;' &lt;file&gt;</code></td>
+<td>Print lines in a file that contain the text</td>
+</tr>
+<tr>
+<td><code>grep -r '&lt;text&gt;' &lt;dir&gt;</code></td>
+<td>Search all files in a directory and its subdirectories</td>
+</tr>
+<tr>
+<td><code>sort &lt;file&gt;</code></td>
+<td>Print a file's lines in sorted order (<code>sort -r</code> reverses)</td>
+</tr>
+<tr>
+<td><code>echo &lt;text&gt;</code></td>
+<td>Print text to the terminal</td>
+</tr>
+<tr>
+<td><code>man &lt;command&gt;</code></td>
+<td>Read the manual for a command (space = next page, <code>q</code> = quit)</td>
+</tr>
+</tbody></table>
+<h2 data-section-id="redirection-and-pipes-513fb329">Redirection and Pipes</h2><div class="note-anchor" data-for="redirection-and-pipes-513fb329"></div>
+<table>
+<thead>
+<tr>
+<th>Syntax</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>cmd &gt; file</code></td>
+<td>Send stdout to a file (overwrites the file)</td>
+</tr>
+<tr>
+<td><code>cmd &gt;&gt; file</code></td>
+<td>Append stdout to a file</td>
+</tr>
+<tr>
+<td><code>cmd &lt; file</code></td>
+<td>Read stdin from a file instead of the keyboard</td>
+</tr>
+<tr>
+<td><code>cmd1 | cmd2</code></td>
+<td>Connect cmd1's stdout to cmd2's stdin</td>
+</tr>
+</tbody></table>
+<p data-section-id="redirection-and-pipes-22f1ab12">Example: <code>ls -l | grep 'txt' &gt; results.txt</code> lists files, filters for 'txt', and saves the result to a file. Each command in a pipeline runs as its own process. The OS moves the data between them (inter-process communication).</p><div class="note-anchor" data-for="redirection-and-pipes-22f1ab12"></div>
+<h2 data-section-id="processes-afaf501a">Processes</h2><div class="note-anchor" data-for="processes-afaf501a"></div>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>ps</code></td>
+<td>List the processes in your terminal session (pids, etc.)</td>
+</tr>
+<tr>
+<td><code>sleep &lt;n&gt;</code></td>
+<td>Create a process that waits n seconds, then exits</td>
+</tr>
+<tr>
+<td><code>kill &lt;pid&gt;</code></td>
+<td>Send a signal to a process to terminate it</td>
+</tr>
+<tr>
+<td><code>cmd &amp;</code></td>
+<td>Run a command in the background (shell does not wait)</td>
+</tr>
+<tr>
+<td>CTRL-C</td>
+<td>Send a signal to terminate the foreground process</td>
+</tr>
+</tbody></table>
+<p data-section-id="processes-c36c96df">Remember: every command runs as a child process of your shell. Foreground means the shell blocks and waits for the child. Background (<code>&amp;</code>) means it doesn't.</p><div class="note-anchor" data-for="processes-c36c96df"></div>
+<h2 data-section-id="path-and-executables-2632bf06">PATH and Executables</h2><div class="note-anchor" data-for="path-and-executables-2632bf06"></div>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>echo $PATH</code></td>
+<td>Show the directories the shell searches for commands</td>
+</tr>
+<tr>
+<td><code>echo $PATH | tr ':' '\n'</code></td>
+<td>Same, but one directory per line</td>
+</tr>
+<tr>
+<td><code>which &lt;command&gt;</code></td>
+<td>Show the full path of a command's executable file</td>
+</tr>
+</tbody></table>
+<p data-section-id="path-and-executables-7c535982"><code>PATH</code> is an environment variable. Child processes inherit it from the shell.</p><div class="note-anchor" data-for="path-and-executables-7c535982"></div>
+<h2 data-section-id="permissions-7a3f08e3">Permissions</h2><div class="note-anchor" data-for="permissions-7a3f08e3"></div>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>chmod u+x &lt;file&gt;</code></td>
+<td>Add execute permission for the owner</td>
+</tr>
+<tr>
+<td><code>sudo &lt;command&gt;</code></td>
+<td>Run a command as the superuser (root)</td>
+</tr>
+</tbody></table>
+<p data-section-id="permissions-4944cc1d">Reading <code>ls -l</code> permission strings: <code>-rw-r--r--</code> = regular file (<code>-</code>), owner can read and write (<code>rw-</code>), group can read (<code>r--</code>), others can read (<code>r--</code>). A <code>d</code> in the first position means directory.</p><div class="note-anchor" data-for="permissions-4944cc1d"></div>
+<h2 data-section-id="odds-and-ends-fc7bcb54">Odds and Ends</h2><div class="note-anchor" data-for="odds-and-ends-fc7bcb54"></div>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>exit</code></td>
+<td>Terminate the shell process (closes the terminal)</td>
+</tr>
+<tr>
+<td><code>find . -type f -mtime -1</code></td>
+<td>Find files modified in the last 24 hours (from the intro demo)</td>
+</tr>
+</tbody></table>
+
+    </main>
+
+    <script>
+        
+(function() {
+    var PAGE_ID = 'cheatsheet';
+    var STORAGE_KEY = 'lecture-notes:' + PAGE_ID;
+
+    function parseMarkdown(text) {
+        if (!text) return '';
+        return text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.+?)\*/g, '<em>$1</em>')
+            .replace(/`(.+?)`/g, '<code>$1</code>')
+            .replace(/\n/g, '<br>');
+    }
+
+    function getNotes() {
+        try {
+            var data = localStorage.getItem(STORAGE_KEY);
+            return data ? JSON.parse(data) : {};
+        } catch (e) {
+            console.error('Error reading notes:', e);
+            return {};
+        }
+    }
+
+    // Short excerpt of the section a note is attached to.
+    // Stored with the note so that if the section is later edited or
+    // removed (which changes its ID), the orphaned note still shows
+    // what it referred to.
+    function getSectionExcerpt(sectionId) {
+        var el = document.querySelector('[data-section-id="' + sectionId + '"]');
+        if (!el) return '';
+        var text = el.textContent.replace(/\s+/g, ' ').trim();
+        return text.length > 150 ? text.slice(0, 150) + '...' : text;
+    }
+
+    function saveNote(sectionId, text, needsClarification) {
+        var notes = getNotes();
+        if (text.trim()) {
+            notes[sectionId] = {
+                text: text,
+                timestamp: (notes[sectionId] && notes[sectionId].timestamp) || Date.now(),
+                lastEdited: Date.now(),
+                needsClarification: needsClarification || false,
+                sectionExcerpt: (notes[sectionId] && notes[sectionId].sectionExcerpt) || getSectionExcerpt(sectionId)
+            };
+        } else {
+            delete notes[sectionId];
+        }
+        try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+        } catch (e) {
+            alert('Unable to save note. Local storage may be full.');
+        }
+    }
+
+    function toggleClarification(sectionId, needsClarification) {
+        var notes = getNotes();
+        if (notes[sectionId]) {
+            notes[sectionId].needsClarification = needsClarification;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+        }
+    }
+
+    function deleteNote(sectionId) {
+        var notes = getNotes();
+        delete notes[sectionId];
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
+    }
+
+    function formatDate(timestamp) {
+        return new Date(timestamp).toLocaleString();
+    }
+
+    // Remove the hover highlight from a note's target section. Called
+    // whenever the anchor re-renders (editor open, save, cancel, delete),
+    // because replacing the button prevents its mouseout from ever firing.
+    function clearTargetHighlight(sectionId) {
+        var target = document.querySelector('[data-section-id="' + sectionId + '"]');
+        if (target) target.classList.remove('note-target-highlight');
+    }
+
+    function renderAddButton(anchor, sectionId) {
+        clearTargetHighlight(sectionId);
+        anchor.innerHTML = '<button class="add-note-btn" data-section="' + sectionId + '">' +
+            '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+            '<path d="M12 5v14M5 12h14"/>' +
+            '</svg> Add note</button>';
+    }
+
+    function renderNoteEditor(anchor, sectionId, existingText) {
+        clearTargetHighlight(sectionId);
+        existingText = existingText || '';
+        var notes = getNotes();
+        var noteData = notes[sectionId];
+        var needsClarification = (noteData && noteData.needsClarification) || false;
+        var clarificationClass = needsClarification ? 'needs-clarification' : '';
+        var checkboxId = 'clarify-edit-' + sectionId;
+
+        anchor.innerHTML = '<div class="note-container editing ' + clarificationClass + '">' +
+            '<div class="note-header">' +
+            '<span class="note-label">My Note</span>' +
+            '<div class="note-actions">' +
+            '<button class="save-btn">Save</button>' +
+            '<button class="cancel-btn">Cancel</button>' +
+            '</div></div>' +
+            '<textarea class="note-editor" placeholder="Write your note here (using plain text or markdown)...">' + existingText + '</textarea>' +
+            '<div class="clarification-checkbox">' +
+            '<input type="checkbox" id="' + checkboxId + '"' + (needsClarification ? ' checked' : '') + '>' +
+            '<label for="' + checkboxId + '">I need clarification from the instructor</label>' +
+            '</div>' +
+            '</div>';
+
+        var container = anchor.querySelector('.note-container');
+        var textarea = anchor.querySelector('.note-editor');
+        var saveBtn = anchor.querySelector('.save-btn');
+        var cancelBtn = anchor.querySelector('.cancel-btn');
+        var clarifyCheckbox = anchor.querySelector('#' + checkboxId);
+
+        textarea.focus();
+
+        clarifyCheckbox.addEventListener('change', function() {
+            if (clarifyCheckbox.checked) {
+                container.classList.add('needs-clarification');
+            } else {
+                container.classList.remove('needs-clarification');
+            }
+        });
+
+        saveBtn.addEventListener('click', function() {
+            saveNote(sectionId, textarea.value, clarifyCheckbox.checked);
+            if (textarea.value.trim()) {
+                renderSavedNote(anchor, sectionId, textarea.value, false);
+            } else {
+                renderAddButton(anchor, sectionId);
+            }
+            updateToggleButton();
+        });
+
+        cancelBtn.addEventListener('click', function() {
+            var notes = getNotes();
+            if (notes[sectionId]) {
+                renderSavedNote(anchor, sectionId, notes[sectionId].text, false);
+            } else {
+                renderAddButton(anchor, sectionId);
+            }
+        });
+
+        textarea.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                saveBtn.click();
+            } else if (e.key === 'Escape') {
+                cancelBtn.click();
+            }
+        });
+    }
+
+    function renderSavedNote(anchor, sectionId, text, collapsed) {
+        clearTargetHighlight(sectionId);
+        var notes = getNotes();
+        var noteData = notes[sectionId];
+        var lastEdited = (noteData && noteData.lastEdited) ? formatDate(noteData.lastEdited) : '';
+        var needsClarification = (noteData && noteData.needsClarification) || false;
+        var collapsedClass = collapsed ? 'collapsed' : '';
+        var clarificationClass = needsClarification ? 'needs-clarification' : '';
+        var indicator = collapsed ? '&#9654;' : '&#9660;';
+        var checkboxId = 'clarify-' + sectionId;
+
+        anchor.innerHTML = '<div class="note-container ' + collapsedClass + ' ' + clarificationClass + '">' +
+            '<div class="note-header">' +
+            '<span class="note-label expand-indicator">' + indicator + ' My Note</span>' +
+            '<div class="note-actions">' +
+            '<button class="edit-btn">Edit</button>' +
+            '<button class="delete-btn">Delete</button>' +
+            '</div></div>' +
+            '<div class="note-content">' + parseMarkdown(text) + '</div>' +
+            '<div class="clarification-checkbox">' +
+            '<input type="checkbox" id="' + checkboxId + '"' + (needsClarification ? ' checked' : '') + '>' +
+            '<label for="' + checkboxId + '">I need clarification from the instructor</label>' +
+            '</div>' +
+            (lastEdited ? '<div class="note-meta">Last edited: ' + lastEdited + '</div>' : '') +
+            '</div>';
+
+        var container = anchor.querySelector('.note-container');
+        var expandIndicator = anchor.querySelector('.expand-indicator');
+        var editBtn = anchor.querySelector('.edit-btn');
+        var deleteBtn = anchor.querySelector('.delete-btn');
+        var clarifyCheckbox = anchor.querySelector('#' + checkboxId);
+
+        expandIndicator.addEventListener('click', function() {
+            container.classList.toggle('collapsed');
+            expandIndicator.innerHTML = container.classList.contains('collapsed')
+                ? '&#9654; My Note'
+                : '&#9660; My Note';
+        });
+
+        clarifyCheckbox.addEventListener('change', function() {
+            var isChecked = clarifyCheckbox.checked;
+            toggleClarification(sectionId, isChecked);
+            if (isChecked) {
+                container.classList.add('needs-clarification');
+            } else {
+                container.classList.remove('needs-clarification');
+            }
+        });
+
+        editBtn.addEventListener('click', function() {
+            renderNoteEditor(anchor, sectionId, text);
+        });
+
+        deleteBtn.addEventListener('click', function() {
+            if (confirm('Delete this note?')) {
+                deleteNote(sectionId);
+                renderAddButton(anchor, sectionId);
+                updateToggleButton();
+            }
+        });
+    }
+
+    // Report how much data this page's notes occupy in localStorage.
+    // Size is the UTF-8 byte length of the stored JSON. Recomputed each
+    // time the tooltip is shown so it is always current.
+    function updateStorageInfo() {
+        var el = document.getElementById('storage-info');
+        if (!el) return;
+        var data = localStorage.getItem(STORAGE_KEY);
+        var noteCount = Object.keys(getNotes()).length;
+        if (!data || noteCount === 0) {
+            el.textContent = 'No notes saved yet (0 bytes).';
+            return;
+        }
+        var bytes = new Blob([data]).size;
+        var sizeText = bytes < 1024
+            ? bytes + ' bytes'
+            : (bytes / 1024).toFixed(1) + ' KB';
+        el.textContent = 'Currently storing ' + noteCount + ' note' + (noteCount === 1 ? '' : 's') +
+            ' using ' + sizeText + ' of local storage.';
+    }
+
+    var notesExpanded = false;
+
+    function updateToggleButton() {
+        var notes = getNotes();
+        var count = Object.keys(notes).length;
+        var btn = document.getElementById('toggle-notes-btn');
+        var svg = btn.querySelector('svg path');
+        var countSpan = btn.querySelector('.note-count');
+
+        if (notesExpanded) {
+            svg.setAttribute('d', 'M18 15l-6-6-6 6');
+            btn.title = 'Collapse All Notes';
+        } else {
+            svg.setAttribute('d', 'M6 9l6 6 6-6');
+            btn.title = 'Expand All Notes';
+        }
+
+        countSpan.textContent = count > 0 ? count : '';
+    }
+
+    // Render notes whose sections no longer exist (edited or removed
+    // content changes the section ID). Shown at the bottom so the work
+    // is never silently lost.
+    function renderOrphanNotes() {
+        var existing = document.getElementById('orphan-notes');
+        if (existing) existing.remove();
+
+        var notes = getNotes();
+        var knownIds = {};
+        document.querySelectorAll('.note-anchor').forEach(function(anchor) {
+            knownIds[anchor.dataset.for] = true;
+        });
+
+        var orphanIds = Object.keys(notes).filter(function(id) {
+            return !knownIds[id];
+        });
+        if (orphanIds.length === 0) return;
+
+        var block = document.createElement('div');
+        block.id = 'orphan-notes';
+        block.className = 'orphan-notes';
+
+        var html = '<h2 class="orphan-heading">Notes from removed or changed sections</h2>' +
+            '<p class="orphan-explain">These notes were attached to content that has since been edited or removed. ' +
+            'The original text they referred to is shown above each note.</p>';
+
+        orphanIds.forEach(function(id) {
+            var noteData = notes[id];
+            html += '<div class="orphan-note" data-orphan-id="' + id + '">' +
+                (noteData.sectionExcerpt
+                    ? '<div class="orphan-excerpt">Original section: &ldquo;' + parseMarkdown(noteData.sectionExcerpt) + '&rdquo;</div>'
+                    : '') +
+                '<div class="note-content">' + parseMarkdown(noteData.text) + '</div>' +
+                (noteData.needsClarification ? '<div class="clarification-flag">I need clarification from the instructor</div>' : '') +
+                '<button class="orphan-delete-btn">Delete</button>' +
+                '</div>';
+        });
+
+        block.innerHTML = html;
+        document.querySelector('.content').appendChild(block);
+
+        block.querySelectorAll('.orphan-delete-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                if (confirm('Delete this note?')) {
+                    var orphanEl = btn.closest('.orphan-note');
+                    deleteNote(orphanEl.dataset.orphanId);
+                    renderOrphanNotes();
+                    updateToggleButton();
+                }
+            });
+        });
+    }
+
+    // ----- Notes backup: export/import as JSON -----
+    var backupPanel = document.getElementById('backup-panel');
+    var backupBtn = document.getElementById('backup-btn');
+
+    backupBtn.addEventListener('click', function() {
+        backupPanel.hidden = !backupPanel.hidden;
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!backupPanel.hidden && !backupPanel.contains(e.target) && !backupBtn.contains(e.target)) {
+            backupPanel.hidden = true;
+        }
+    });
+
+    // Re-render every note anchor from what is currently in storage.
+    // Used after an import; does not re-attach anchor listeners.
+    function refreshNotesFromStorage() {
+        var notes = getNotes();
+        document.querySelectorAll('.note-anchor').forEach(function(anchor) {
+            var sectionId = anchor.dataset.for;
+            if (notes[sectionId]) {
+                renderSavedNote(anchor, sectionId, notes[sectionId].text, true);
+            } else {
+                renderAddButton(anchor, sectionId);
+            }
+        });
+        renderOrphanNotes();
+        updateToggleButton();
+    }
+
+    document.getElementById('notes-export-btn').addEventListener('click', function() {
+        var notes = getNotes();
+        if (Object.keys(notes).length === 0) {
+            alert('There are no notes on this page to export yet.');
+            return;
+        }
+        var payload = {
+            format: 'lecture-notes-backup',
+            version: 1,
+            pageId: PAGE_ID,
+            title: document.title,
+            exported: new Date().toISOString(),
+            notes: notes
+        };
+        var blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = PAGE_ID + '-notes.json';
+        a.click();
+        URL.revokeObjectURL(url);
+        backupPanel.hidden = true;
+    });
+
+    document.getElementById('notes-import-btn').addEventListener('click', function() {
+        document.getElementById('notes-import-input').click();
+    });
+
+    document.getElementById('notes-import-input').addEventListener('change', function(e) {
+        var file = e.target.files[0];
+        e.target.value = '';
+        if (!file) return;
+
+        var reader = new FileReader();
+        reader.onload = function() {
+            var payload;
+            try {
+                payload = JSON.parse(reader.result);
+            } catch (err) {
+                alert('That file is not valid JSON.');
+                return;
+            }
+            if (!payload || payload.format !== 'lecture-notes-backup' || typeof payload.notes !== 'object' || payload.notes === null) {
+                alert('That file does not look like a notes backup from this tool.');
+                return;
+            }
+            if (payload.pageId !== PAGE_ID) {
+                var proceed = confirm(
+                    'This backup is from a different lecture page ("' + payload.pageId + '").\n' +
+                    'Notes will only reattach to sections with matching content; the rest will show as orphaned notes.\n\n' +
+                    'Import anyway?');
+                if (!proceed) return;
+            }
+
+            var existing = getNotes();
+            var added = 0;
+            var replaced = 0;
+            Object.keys(payload.notes).forEach(function(sectionId) {
+                var note = payload.notes[sectionId];
+                if (!note || typeof note.text !== 'string') return;
+                if (existing[sectionId]) { replaced++; } else { added++; }
+                existing[sectionId] = note;
+            });
+
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(existing));
+            } catch (err) {
+                alert('Could not save the imported notes (storage may be full).');
+                return;
+            }
+
+            refreshNotesFromStorage();
+            backupPanel.hidden = true;
+            alert('Imported ' + (added + replaced) + ' note' + ((added + replaced) === 1 ? '' : 's') +
+                (replaced > 0 ? ' (' + replaced + ' replaced existing notes with the same section)' : '') + '.');
+        };
+        reader.readAsText(file);
+    });
+
+    // ----- Review mode -----
+    // Practice every question on the page in a shuffled sequence with a
+    // score at the end. One attempt per question; the correct answer and
+    // explanation are revealed after answering. Nothing is stored.
+    var reviewActive = false;
+    var reviewQuestions = [];
+    var reviewIndex = 0;
+    var reviewScore = 0;
+    var reviewAnswered = false;
+    var reviewOverlay = document.getElementById('review-overlay');
+    var reviewBody = document.getElementById('review-body');
+    var reviewProgress = document.getElementById('review-progress');
+    var reviewBtn = document.getElementById('review-btn');
+
+    function collectReviewQuestions() {
+        return Array.from(document.querySelectorAll('.content .quiz-block')).map(function(block) {
+            return {
+                question: block.querySelector('.quiz-question').innerHTML,
+                options: Array.from(block.querySelectorAll('.quiz-option')).map(function(o) {
+                    return { html: o.innerHTML, correct: o.dataset.correct === 'true' };
+                }),
+                explanation: block.querySelector('.quiz-explanation').innerHTML
+            };
+        });
+    }
+
+    function shuffle(arr) {
+        for (var i = arr.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var tmp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = tmp;
+        }
+        return arr;
+    }
+
+    function startReview() {
+        reviewQuestions = shuffle(collectReviewQuestions());
+        if (reviewQuestions.length === 0) return;
+        reviewIndex = 0;
+        reviewScore = 0;
+        reviewActive = true;
+        reviewOverlay.hidden = false;
+        renderReviewQuestion();
+    }
+
+    function closeReview() {
+        reviewActive = false;
+        reviewOverlay.hidden = true;
+    }
+
+    function renderReviewQuestion() {
+        reviewAnswered = false;
+        var q = reviewQuestions[reviewIndex];
+        reviewProgress.textContent = 'Question ' + (reviewIndex + 1) + ' of ' + reviewQuestions.length;
+
+        var optionsHtml = q.options.map(function(o, i) {
+            return '<button class="review-option" data-correct="' + o.correct + '">' + o.html + '</button>';
+        }).join('');
+
+        reviewBody.innerHTML =
+            '<div class="review-question">' + q.question + '</div>' +
+            '<div class="review-options">' + optionsHtml + '</div>' +
+            '<div class="review-explanation" hidden>' + q.explanation + '</div>' +
+            '<button class="review-next" hidden>' +
+                (reviewIndex === reviewQuestions.length - 1 ? 'See score' : 'Next question') +
+            '</button>';
+
+        reviewBody.querySelectorAll('.review-option').forEach(function(option) {
+            option.addEventListener('click', function() {
+                if (reviewAnswered) return;
+                reviewAnswered = true;
+                if (option.dataset.correct === 'true') {
+                    option.classList.add('right');
+                    reviewScore++;
+                } else {
+                    option.classList.add('wrong');
+                    // Reveal which answer was correct
+                    reviewBody.querySelectorAll('.review-option').forEach(function(o) {
+                        if (o.dataset.correct === 'true') o.classList.add('right');
+                    });
+                }
+                reviewBody.querySelector('.review-explanation').hidden = false;
+                reviewBody.querySelector('.review-next').hidden = false;
+            });
+        });
+
+        reviewBody.querySelector('.review-next').addEventListener('click', function() {
+            reviewIndex++;
+            if (reviewIndex >= reviewQuestions.length) {
+                renderReviewScore();
+            } else {
+                renderReviewQuestion();
+            }
+        });
+    }
+
+    function renderReviewScore() {
+        reviewProgress.textContent = 'Results';
+        reviewBody.innerHTML =
+            '<div class="review-score">' +
+                '<div class="score-number">' + reviewScore + ' / ' + reviewQuestions.length + '</div>' +
+                '<div>correct on the first try</div>' +
+                '<button class="review-next" id="review-retry">Practice again</button>' +
+                '<button class="review-next secondary" id="review-done">Close</button>' +
+            '</div>';
+        document.getElementById('review-retry').addEventListener('click', startReview);
+        document.getElementById('review-done').addEventListener('click', closeReview);
+    }
+
+    reviewBtn.addEventListener('click', startReview);
+    document.getElementById('review-close').addEventListener('click', closeReview);
+    reviewOverlay.addEventListener('click', function(e) {
+        if (e.target === reviewOverlay) closeReview();
+    });
+
+    // ----- Presenter mode -----
+    // Lecture with the page instead of slides: P toggles, arrow keys move
+    // section by section, everything but the current section dims, Esc exits.
+    var presenting = false;
+    var presenterTargets = [];
+    var presenterStart = 0; // first highlighted section
+    var presenterEnd = 0;   // last highlighted section (inclusive)
+    var presenterBtn = document.getElementById('presenter-btn');
+    var presenterCounter = document.getElementById('presenter-counter');
+    var presenterPosition = document.getElementById('presenter-position');
+
+    function collectPresenterTargets() {
+        presenterTargets = Array.from(document.querySelector('.content').children).filter(function(el) {
+            return el.hasAttribute('data-section-id') || el.classList.contains('quiz-block');
+        });
+    }
+
+    function clampIndex(i) {
+        if (i < 0) return 0;
+        if (i > presenterTargets.length - 1) return presenterTargets.length - 1;
+        return i;
+    }
+
+    // Highlight sections start..end (inclusive) and scroll scrollTo into view
+    function setPresenterRange(start, end, scrollTo) {
+        presenterStart = clampIndex(start);
+        presenterEnd = clampIndex(end);
+        presenterTargets.forEach(function(el, i) {
+            el.classList.toggle('presenter-current', i >= presenterStart && i <= presenterEnd);
+        });
+        presenterPosition.textContent = presenterStart === presenterEnd
+            ? (presenterStart + 1) + ' / ' + presenterTargets.length
+            : (presenterStart + 1) + '-' + (presenterEnd + 1) + ' / ' + presenterTargets.length;
+        var target = presenterTargets[clampIndex(scrollTo === undefined ? presenterEnd : scrollTo)];
+        if (target && typeof target.scrollIntoView === 'function') {
+            target.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        }
+    }
+
+    function enterPresenterMode() {
+        collectPresenterTargets();
+        if (presenterTargets.length === 0) return;
+        presenting = true;
+        document.body.classList.add('presenting');
+        document.getElementById('toc-panel').classList.remove('open');
+        presenterCounter.hidden = false;
+        // Start at the section nearest the top of the current view
+        var start = 0;
+        for (var i = 0; i < presenterTargets.length; i++) {
+            var rect = presenterTargets[i].getBoundingClientRect();
+            if (rect.top >= -10) { start = i; break; }
+        }
+        setPresenterRange(start, start);
+    }
+
+    function exitPresenterMode() {
+        presenting = false;
+        document.body.classList.remove('presenting');
+        presenterCounter.hidden = true;
+        presenterTargets.forEach(function(el) { el.classList.remove('presenter-current'); });
+    }
+
+    presenterBtn.addEventListener('click', function() {
+        if (presenting) { exitPresenterMode(); } else { enterPresenterMode(); }
+    });
+
+    document.addEventListener('keydown', function(e) {
+        // While the review overlay is open, it owns the keyboard
+        if (reviewActive) {
+            if (e.key === 'Escape') closeReview();
+            return;
+        }
+        var tag = (e.target.tagName || '').toLowerCase();
+        if (tag === 'textarea' || tag === 'input' || tag === 'select') return;
+        if ((e.key === 'p' || e.key === 'P') && !e.ctrlKey && !e.metaKey && !e.altKey) {
+            e.preventDefault();
+            if (presenting) { exitPresenterMode(); } else { enterPresenterMode(); }
+            return;
+        }
+        if (!presenting) return;
+        if (e.key === 'Escape') { exitPresenterMode(); return; }
+
+        var forward = (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown');
+        var backward = (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp');
+
+        if (forward && e.shiftKey) {
+            // Extend the spotlight forward by one section
+            e.preventDefault();
+            setPresenterRange(presenterStart, presenterEnd + 1);
+        } else if (backward && e.shiftKey) {
+            // Shrink the spotlight from the end (never below one section)
+            e.preventDefault();
+            if (presenterEnd > presenterStart) {
+                setPresenterRange(presenterStart, presenterEnd - 1);
+            }
+        } else if (forward) {
+            // Collapse to the single section after the current range
+            e.preventDefault();
+            var next = clampIndex(presenterEnd + 1);
+            setPresenterRange(next, next);
+        } else if (backward) {
+            // Collapse to the single section before the current range
+            e.preventDefault();
+            var prev = clampIndex(presenterStart - 1);
+            setPresenterRange(prev, prev);
+        } else if (e.key === 'Home') {
+            e.preventDefault();
+            setPresenterRange(0, 0);
+        } else if (e.key === 'End') {
+            e.preventDefault();
+            var last = presenterTargets.length - 1;
+            setPresenterRange(last, last);
+        }
+    });
+
+    // Wire up self-grading questions: retry until correct, then show the
+    // explanation. Answers are never stored; a self-test resets on reload.
+    function initQuizzes() {
+        document.querySelectorAll('.quiz-block').forEach(function(block) {
+            var explanation = block.querySelector('.quiz-explanation');
+            var resetBtn = block.querySelector('.quiz-reset');
+
+            block.querySelectorAll('.quiz-option').forEach(function(option) {
+                option.addEventListener('click', function() {
+                    if (block.classList.contains('solved')) return;
+                    if (option.classList.contains('wrong')) return;
+                    if (option.dataset.correct === 'true') {
+                        option.classList.add('right');
+                        block.classList.add('solved');
+                        explanation.hidden = false;
+                        resetBtn.hidden = false;
+                    } else {
+                        option.classList.add('wrong');
+                    }
+                });
+            });
+
+            resetBtn.addEventListener('click', function() {
+                block.classList.remove('solved');
+                block.querySelectorAll('.quiz-option').forEach(function(o) {
+                    o.classList.remove('right', 'wrong');
+                });
+                explanation.hidden = true;
+                resetBtn.hidden = true;
+            });
+        });
+    }
+
+    function init() {
+        var notes = getNotes();
+        var anchors = document.querySelectorAll('.note-anchor');
+
+        anchors.forEach(function(anchor) {
+            var sectionId = anchor.dataset.for;
+            if (notes[sectionId]) {
+                renderSavedNote(anchor, sectionId, notes[sectionId].text, true);
+            } else {
+                renderAddButton(anchor, sectionId);
+            }
+
+            anchor.addEventListener('click', function(e) {
+                if (e.target.classList.contains('add-note-btn') || e.target.closest('.add-note-btn')) {
+                    renderNoteEditor(anchor, sectionId);
+                }
+            });
+
+            // Highlight the section a note would attach to while hovering
+            // its Add note button
+            anchor.addEventListener('mouseover', function(e) {
+                if (e.target.closest('.add-note-btn')) {
+                    var target = document.querySelector('[data-section-id="' + sectionId + '"]');
+                    if (target) target.classList.add('note-target-highlight');
+                }
+            });
+            anchor.addEventListener('mouseout', function(e) {
+                var btn = e.target.closest('.add-note-btn');
+                if (btn && !(e.relatedTarget && btn.contains(e.relatedTarget))) {
+                    var target = document.querySelector('[data-section-id="' + sectionId + '"]');
+                    if (target) target.classList.remove('note-target-highlight');
+                }
+            });
+        });
+
+        renderOrphanNotes();
+        initQuizzes();
+        if (document.querySelectorAll('.content .quiz-block').length === 0) {
+            reviewBtn.style.display = 'none';
+        }
+        updateToggleButton();
+    }
+
+    document.getElementById('toggle-notes-btn').addEventListener('click', function() {
+        if (notesExpanded) {
+            document.querySelectorAll('.note-container:not(.collapsed)').forEach(function(container) {
+                container.classList.add('collapsed');
+                var indicator = container.querySelector('.expand-indicator');
+                if (indicator) {
+                    indicator.innerHTML = '&#9654; My Note';
+                }
+            });
+        } else {
+            document.querySelectorAll('.note-container.collapsed').forEach(function(container) {
+                container.classList.remove('collapsed');
+                var indicator = container.querySelector('.expand-indicator');
+                if (indicator) {
+                    indicator.innerHTML = '&#9660; My Note';
+                }
+            });
+        }
+        notesExpanded = !notesExpanded;
+        updateToggleButton();
+    });
+
+    document.getElementById('export-html-btn').addEventListener('click', function() {
+        var notes = getNotes();
+
+        // Clone the content and expand all notes for export
+        var contentEl = document.querySelector('.content');
+        var clonedContent = contentEl.cloneNode(true);
+
+        // Process each note anchor in the cloned content
+        clonedContent.querySelectorAll('.note-anchor').forEach(function(anchor) {
+            var sectionId = anchor.dataset.for;
+            if (notes[sectionId]) {
+                var noteData = notes[sectionId];
+                var clarificationClass = noteData.needsClarification ? ' needs-clarification' : '';
+                anchor.innerHTML = '<div class="note-container exported' + clarificationClass + '">' +
+                    '<div class="note-header"><span class="note-label">My Note</span></div>' +
+                    '<div class="note-content">' + parseMarkdown(noteData.text) + '</div>' +
+                    (noteData.needsClarification ? '<div class="clarification-flag">I need clarification from the instructor</div>' : '') +
+                    '</div>';
+            } else {
+                anchor.remove();
+            }
+        });
+
+        // Orphaned notes are kept in the export, minus their delete buttons
+        clonedContent.querySelectorAll('.orphan-delete-btn').forEach(function(btn) {
+            btn.remove();
+        });
+
+        // Quizzes cannot be interactive in a static export: mark the correct
+        // answer, show the explanation, drop the reset button
+        clonedContent.querySelectorAll('.quiz-block').forEach(function(block) {
+            block.querySelectorAll('.quiz-option').forEach(function(o) {
+                o.classList.remove('wrong');
+                if (o.dataset.correct === 'true') o.classList.add('right');
+                o.disabled = true;
+            });
+            var expl = block.querySelector('.quiz-explanation');
+            if (expl) expl.hidden = false;
+            var reset = block.querySelector('.quiz-reset');
+            if (reset) reset.remove();
+        });
+
+        var html = '<!DOCTYPE html>\n<html lang="en">\n<head>\n' +
+            '<meta charset="UTF-8">\n' +
+            '<meta name="viewport" content="width=device-width, initial-scale=1.0">\n' +
+            '<title>Command Line Cheat Sheet - With Notes</title>\n' +
+            '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">\n' +
+            '<style>\n' +
+            '* { box-sizing: border-box; margin: 0; padding: 0; }\n' +
+            'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem; color: #333; }\n' +
+            'h1 { font-size: 1.75rem; margin-bottom: 0.5rem; color: #1a1a1a; border-bottom: 2px solid #e63946; padding-bottom: 0.25rem; }\n' +
+            'h2 { font-size: 1.35rem; margin-top: 2rem; margin-bottom: 0.75rem; color: #1a1a1a; border-bottom: 2px solid #e63946; padding-bottom: 0.25rem; }\n' +
+            'h3 { font-size: 1.15rem; margin-top: 1.5rem; margin-bottom: 0.5rem; color: #2a9d8f; }\n' +
+            'p { margin-bottom: 1rem; }\n' +
+            'ul, ol { margin-bottom: 1rem; padding-left: 1.5rem; }\n' +
+            'li { margin-bottom: 0.35rem; }\n' +
+            'blockquote { background: #f8f9fa; border-left: 4px solid #2a9d8f; padding: 1rem; margin: 1rem 0; border-radius: 0 6px 6px 0; }\n' +
+            'code { background: #e9ecef; padding: 0.15rem 0.4rem; border-radius: 3px; font-family: "SF Mono", Monaco, monospace; font-size: 0.9em; }\n' +
+            'pre { background: #f8f9fa; border-left: 4px solid #e63946; padding: 1rem; margin: 1rem 0; border-radius: 0 6px 6px 0; overflow-x: auto; }\n' +
+            'pre code { background: none; padding: 0; font-size: 0.85em; }\n' +
+            '.hljs { background: transparent !important; }\n' +
+            'img { max-width: 100%; height: auto; margin: 1rem 0; border-radius: 6px; }\n' +
+            'a { color: #e63946; }\n' +
+            '.note-container.exported { background: #e8f4f8; border-left: 4px solid #457b9d; padding: 0.75rem 1rem; margin: 0.5rem 0 1rem 0; border-radius: 0 6px 6px 0; }\n' +
+            '.note-container.exported.needs-clarification { background: #fee2e2; border-left-color: #e63946; }\n' +
+            '.note-header { margin-bottom: 0.5rem; }\n' +
+            '.note-label { font-size: 0.75rem; font-weight: 600; color: #457b9d; text-transform: uppercase; }\n' +
+            '.needs-clarification .note-label { color: #c1121f; }\n' +
+            '.note-content { font-size: 0.9rem; }\n' +
+            '.clarification-flag { font-size: 0.75rem; color: #c1121f; font-weight: 500; margin-top: 0.5rem; }\n' +
+            '.quiz-block { margin: 1.25rem 0; padding: 1rem 1.25rem; background: #fff8f0; border: 1px solid #f4a261; border-left: 4px solid #f4a261; border-radius: 0 6px 6px 0; }\n' +
+            '.quiz-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: #e76f51; margin-bottom: 0.5rem; }\n' +
+            '.quiz-options { display: flex; flex-direction: column; gap: 0.4rem; }\n' +
+            '.quiz-option { text-align: left; padding: 0.5rem 0.75rem; background: white; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; font-size: 0.95em; }\n' +
+            '.quiz-option.right { background: #e6f4f1; border-color: #2a9d8f; color: #1d7268; font-weight: 600; }\n' +
+            '.quiz-explanation { margin-top: 0.75rem; padding: 0.75rem; background: #e6f4f1; border-left: 4px solid #2a9d8f; border-radius: 0 4px 4px 0; font-size: 0.9em; }\n' +
+            '.orphan-notes { margin-top: 3rem; padding-top: 1.5rem; border-top: 2px dashed #ddd; }\n' +
+            '.orphan-heading { color: #666 !important; border-bottom-color: #adb5bd !important; }\n' +
+            '.orphan-explain { font-size: 0.85rem; color: #888; }\n' +
+            '.orphan-note { background: #f8f9fa; border-left: 4px solid #adb5bd; padding: 0.75rem 1rem; margin: 0.75rem 0; border-radius: 0 6px 6px 0; }\n' +
+            '.orphan-excerpt { font-size: 0.8rem; color: #888; font-style: italic; margin-bottom: 0.5rem; }\n' +
+            '.export-meta { text-align: center; color: #888; font-size: 0.8rem; margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #ddd; }\n' +
+            '</style>\n</head>\n<body>\n' +
+            clonedContent.innerHTML +
+            '<div class="export-meta">Exported on ' + new Date().toLocaleDateString() + '</div>\n' +
+            '</body>\n</html>';
+
+        var blob = new Blob([html], { type: 'text/html' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'cheatSheet-with-notes.html';
+        a.click();
+        URL.revokeObjectURL(url);
+    });
+
+    document.getElementById('print-btn').addEventListener('click', function() {
+        document.querySelectorAll('.note-container.collapsed').forEach(function(container) {
+            container.classList.remove('collapsed');
+        });
+        window.print();
+    });
+
+    var infoBtn = document.getElementById('info-btn');
+    infoBtn.addEventListener('mouseenter', updateStorageInfo);
+    infoBtn.addEventListener('focus', updateStorageInfo);
+    updateStorageInfo();
+
+    // Table of Contents
+    var tocBtn = document.getElementById('toc-btn');
+    var tocPanel = document.getElementById('toc-panel');
+    var tocClose = document.getElementById('toc-close');
+    var tocNav = document.getElementById('toc-nav');
+
+    function buildToc() {
+        var notes = getNotes();
+        var headings = document.querySelectorAll('.content h1, .content h2, .content h3');
+        var html = '';
+
+        // Walk the content once in document order, attributing notes and
+        // questions to the most recent heading
+        var headingStats = [];
+        var currentStats = null;
+        Array.from(document.querySelector('.content').children).forEach(function(el) {
+            if (el.closest && el.closest('.orphan-notes')) return;
+            if (/^H[1-3]$/.test(el.tagName)) {
+                currentStats = { noteCount: 0, quizCount: 0 };
+                headingStats.push(currentStats);
+                if (el.dataset.sectionId && notes[el.dataset.sectionId] && currentStats) {
+                    currentStats.noteCount++;
+                }
+                return;
+            }
+            if (!currentStats) return;
+            if (el.classList.contains('quiz-block')) {
+                currentStats.quizCount++;
+            } else if (el.dataset && el.dataset.sectionId && notes[el.dataset.sectionId]) {
+                currentStats.noteCount++;
+            }
+        });
+
+        var totalQuestions = document.querySelectorAll('.content .quiz-block').length;
+        var totalNotes = Object.keys(notes).length;
+        if (totalNotes > 0 || totalQuestions > 0) {
+            html += '<div class="toc-totals">' +
+                totalNotes + ' note' + (totalNotes === 1 ? '' : 's') +
+                ' &middot; ' + totalQuestions + ' question' + (totalQuestions === 1 ? '' : 's') +
+                '</div>';
+        }
+
+        var statIndex = 0;
+        headings.forEach(function(heading, index) {
+            if (heading.closest('.orphan-notes')) return;
+            var id = heading.id || 'heading-' + index;
+            if (!heading.id) heading.id = id;
+            var level = heading.tagName.toLowerCase();
+
+            var stats = headingStats[statIndex] || { noteCount: 0, quizCount: 0 };
+            statIndex++;
+
+            var badges = '';
+            if (stats.noteCount > 0) {
+                badges += ' <span class="toc-count">(' + stats.noteCount + ')</span>';
+            }
+            if (stats.quizCount > 0) {
+                badges += ' <span class="toc-quiz-count">' + stats.quizCount + '?</span>';
+            }
+            html += '<a href="#' + id + '" class="toc-item toc-' + level + '">' + heading.textContent + badges + '</a>';
+        });
+        tocNav.innerHTML = html;
+    }
+
+    tocBtn.addEventListener('click', function() {
+        buildToc();
+        tocPanel.classList.toggle('open');
+    });
+
+    tocClose.addEventListener('click', function() {
+        tocPanel.classList.remove('open');
+    });
+
+    tocNav.addEventListener('click', function(e) {
+        if (e.target.classList.contains('toc-item')) {
+            tocPanel.classList.remove('open');
+        }
+    });
+
+    // Font size controls
+    var fontSize = parseFloat(localStorage.getItem('lecture-notes-fontsize')) || 100;
+    document.body.style.fontSize = fontSize + '%';
+
+    document.getElementById('font-up-btn').addEventListener('click', function() {
+        fontSize = Math.min(fontSize + 10, 250);
+        document.body.style.fontSize = fontSize + '%';
+        localStorage.setItem('lecture-notes-fontsize', fontSize);
+    });
+
+    document.getElementById('font-down-btn').addEventListener('click', function() {
+        fontSize = Math.max(fontSize - 10, 70);
+        document.body.style.fontSize = fontSize + '%';
+        localStorage.setItem('lecture-notes-fontsize', fontSize);
+    });
+
+    init();
+})();
+            
+    </script>
+</body>
+</html>
