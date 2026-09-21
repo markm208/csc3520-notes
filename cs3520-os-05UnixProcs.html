@@ -1041,14 +1041,14 @@
 <p data-section-id="intro-dcf3263f">Every process has a process id called a <code>pid</code>.</p><div class="note-anchor" data-for="intro-dcf3263f"></div>
 <p data-section-id="intro-231e961d">A running process can create one or more 'child' processes. There is a parent/child relationship between the processes.</p><div class="note-anchor" data-for="intro-231e961d"></div>
 <p data-section-id="intro-c06d98ab">Every process keeps track of its parent process id via a <code>ppid</code> (parent process id) field in the process control block (PCB).</p><div class="note-anchor" data-for="intro-c06d98ab"></div>
-<p data-section-id="intro-bf79afe9">There is a process called <code>init</code> that is the ancestor of all processes in the system. It is the first process that is created when the system boots up.</p><div class="note-anchor" data-for="intro-bf79afe9"></div>
+<p data-section-id="intro-bf79afe9">There is a process called <code>init</code> that is the ancestor of all processes in a Unix system. It is the first process that is created when the system boots up.</p><div class="note-anchor" data-for="intro-bf79afe9"></div>
 <p data-section-id="intro-bcd3b419">To compile a C/C++ program, we use the <code>g++</code> compiler.</p><div class="note-anchor" data-for="intro-bcd3b419"></div>
 <pre data-section-id="intro-6cffa4cc"><code class="language-shell">g++ -o myProgram main.cpp
 </code></pre><div class="note-anchor" data-for="intro-6cffa4cc"></div>
 <ul data-section-id="intro-cc57539b">
 <li><p><code>g++</code> is the compiler command. </p>
 </li>
-<li><p><code>-o</code> is an option that tells the compiler to create an executable file with the name <code>myProgram</code>. List the contents of the current directory to see the new executable file.</p>
+<li><p><code>-o</code> is an option that tells the compiler to create an executable file with the name <code>myProgram</code>. </p>
 </li>
 <li><p><code>myProgram.cpp</code> is the source code file. Often, I will use *.cpp as a wildcard to compile all of the C++ source code files in the current directory.</p>
 </li>
