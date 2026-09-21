@@ -1245,12 +1245,12 @@ int main(int argc, char* argv[])
     //fork and run args in the new process
     if(fork() == 0)
     {
-	//child runs new process
+		//child runs new process
         execvp("./args", args_argv);
     }
     else
     {
-	//parent picks up here
+		//parent picks up here
         cout&lt;&lt;"This is the parent"&lt;&lt;endl;
     }
     return 0;
@@ -1263,6 +1263,7 @@ int main(int argc, char* argv[])
 </code></pre><div class="note-anchor" data-for="practice-cf4e4a97"></div>
 <pre data-section-id="practice-3916f978"><code class="language-cpp">#include &lt;iostream&gt;
 #include &lt;unistd.h&gt;
+#include &lt;sys/wait.h&gt;
 
 using namespace std;
 
@@ -1278,7 +1279,7 @@ int main(int argc, char* argv[])
     //fork to create a new process
     if(fork() == 0)
     {
-	//child runs the new program
+		//child runs the new program
         execvp("./args", args_argv);
     }
     else
@@ -1314,7 +1315,7 @@ int main(int argc, char* argv[])
     //if this is the child
     if(childID1 == 0)
     {
-	//run the new program
+		//run the new program
         execvp("./args", args_argv);
     }
     else
@@ -1323,16 +1324,16 @@ int main(int argc, char* argv[])
 	    
 	    if(childID2 == 0)
 	    {
-		//run the new program
+			//run the new program
 	        execlp("ls", "ls", "-l", 0);
 	    }
 	    else
 	    {
-		//wait for the child to complete based on the child ID
-		waitpid(childID1, &amp;status, 0);
-		waitpid(childID2, &amp;status, 0);
+			//wait for the child to complete based on the child ID
+			waitpid(childID1, &amp;status, 0);
+			waitpid(childID2, &amp;status, 0);
 
-		cout&lt;&lt;"This is the parent"&lt;&lt;endl;
+			cout&lt;&lt;"This is the parent"&lt;&lt;endl;
 	    }
     }
     return 0;
@@ -1346,6 +1347,7 @@ int main(int argc, char* argv[])
 </code></pre><div class="note-anchor" data-for="practice-2697997c"></div>
 <pre data-section-id="practice-a6e9d318"><code class="language-cpp">#include &lt;iostream&gt;
 #include &lt;unistd.h&gt;
+#include &lt;sys/wait.h&gt;
 
 using namespace std;
 
@@ -1361,7 +1363,7 @@ int main(int argc, char* argv[])
     //create a new process
     if(fork() == 0)
     {
-	//put child to sleep
+		//put child to sleep
         sleep(2); //sleep for 2 seconds
 
         //run a new program
@@ -1369,7 +1371,7 @@ int main(int argc, char* argv[])
     }
     else
     {
-	//parent will wait for child to complete (block)
+		//parent will wait for child to complete (block)
         wait(&amp;status);
 
         //parent message
@@ -1382,6 +1384,7 @@ int main(int argc, char* argv[])
 <p data-section-id="practice-a4091c4a">Here's another example:</p><div class="note-anchor" data-for="practice-a4091c4a"></div>
 <pre data-section-id="practice-75fabbaa"><code class="language-cpp">#include &lt;iostream&gt;
 #include &lt;unistd.h&gt;
+#include &lt;sys/wait.h&gt;
 
 using namespace std;
 
@@ -1396,12 +1399,12 @@ int main(int argc, char* argv[])
     //create a new process
     if(fork() == 0)
     {
-	//run a new program in the child
+		//run a new program in the child
         execvp("./args", args_argv);
     }
     else
     {
-	//wait for child to complete (block)
+		//wait for child to complete (block)
         wait(&amp;status);
 
         sleep(2); //sleep for 2 seconds
@@ -1424,13 +1427,13 @@ int main(int argc, char* argv[])
     //create a new process
     if(fork() == 0)
     {
-	//kill the child while parent is asleep
+		//kill the child while parent is asleep
         cout&lt;&lt;"I am a child process about to exit"&lt;&lt;endl;
         exit(0); //create a zombie
     }
     else
     {
-	//cause the parent to sleep
+		//cause the parent to sleep
         sleep(2);
 
         //child is gone
@@ -1451,7 +1454,7 @@ int main(int argc, char* argv[])
     //create a new process
     if(fork() == 0)
     {
-	//cause the child to sleep
+		//cause the child to sleep
         sleep(2);
 
         //when child wakes up, parent is no longer there
@@ -1459,7 +1462,7 @@ int main(int argc, char* argv[])
     }
     else
     {
-	//kill the parent while the child is sleeping
+		//kill the parent while the child is sleeping
         exit(0); //create an orphan
     }
     return 0;
