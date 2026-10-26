@@ -1222,7 +1222,7 @@ Post Office             &lt;-&gt;         Post Office
 </li>
 <li>The HTTP request gets wrapped in a TCP (Transmission Control Protocol) segment.<ul>
 <li>The HTTP request may be broken up into multiple packets if the request is large.</li>
-<li>The packets may also be sent out of order, but the web server will be able to reassemble them correctly using sequence numbers that are included in the packets.</li>
+<li>The packets may also be sent out of order, but the TCP software on the web server will be able to reassemble them correctly using sequence numbers that are included in the packets.</li>
 <li>The request is guaranteed to be delivered to the web server. If there is a problem with the network and a packet is lost, then the stack will automatically retransmit the packet until it is successfully delivered (or it gives up and determines it is undeliverable).</li>
 </ul>
 </li>
